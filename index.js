@@ -362,5 +362,7 @@
 
   };
 
-  module.exports = SME;
+  module.exports = {
+    Plugin: SME
+  };
 })();
