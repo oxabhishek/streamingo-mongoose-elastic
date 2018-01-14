@@ -1,0 +1,28 @@
+{
+  "name": "streamingo-mongoose-elastic",
+  "version": "1.2.7",
+  "description": "NPM Module for mongoose and elastic-search",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mongoose",
+    "elastic-search",
+    "streamingo"
+  ],
+  "author": "Abhishek Sharma <abhishek@streamingo.ai> (https://streamingo.ai)",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.0",
+    "elasticsearch": "^14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oxabhishek/streamingo-mongoose-elastic"
+  },
+  "bugs": {
+    "url": "https://github.com/oxabhishek/streamingo-mongoose-elastic/issues/new",
+    "email": "abhishek@streamingo.ai"
+  }
+}
