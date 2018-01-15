@@ -52,7 +52,7 @@ To have a model indexed into Elasticsearch simply add the plugin.
 
 ```javascript
 var mongoose                    = require('mongoose'),
-    smElastic = require('streamingo-mongoose-elastic'),
+    smElastic = require('streamingo-mongoose-elastic').Plugin, // please note, this is for version 2.x.x onwards; for v1.x.x, the .Plugin was not needed
     Schema                      = mongoose.Schema
 
 var Band = new Schema({
