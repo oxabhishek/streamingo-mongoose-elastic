@@ -1,6 +1,6 @@
 {
   "name": "streamingo-mongoose-elastic",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "NPM Module for mongoose and elastic-search",
   "main": "index.js",
   "scripts": {
