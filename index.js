@@ -1,6 +1,7 @@
 (function () {
   "use strict";
-  var SME,
+  var MongoosePlugin,
+    QuerySearchBuilder,
     elasticSearch = require("elasticsearch"),
     client,
     async = require("async"),
@@ -13,7 +14,7 @@
    * @param options - mongoose plugin provides options object by invoking this constructor
    * @constructor
    */
-  SME = function (schema, options) {
+  MongoosePlugin = function (schema, options) {
     var ESoptions = {};
 
     if (typeof options !== "object" || Object.keys(options).length === 0) {
@@ -47,7 +48,7 @@
       }
 
       // instantiate new ES client
-      client = new elasticSearch.Client(options);
+      client = new elasticSearch.Client(ESoptions);
     }
 
     /**
@@ -362,7 +363,43 @@
 
   };
 
+  QuerySearchBuilder = function (options) {
+    var ESoptions = {},
+      publicMethods = {},
+      privateMethods = {};
+
+    if (typeof options !== "object" || Array.isArray(options)) {
+      options = {};
+    }
+
+    if (options.esClient) {
+
+      // use the existing ES client
+      client = options.esClient;
+    } else {
+
+      ESoptions.hosts = Array.isArray(options.hosts) ? options.hosts : undefined;
+      if (!ESoptions.hosts) {
+        ESoptions.host = options.host || "localhost:9200";
+      }
+
+      // instantiate new ES client
+      client = new elasticSearch.Client(ESoptions);
+    }
+
+    /**
+     * @description Returns raw elastic search client
+     * @public
+     */
+    publicMethods._getESClient = function () {
+      return client;
+    }
+
+    return publicMethods;
+  };
+
   module.exports = {
-    Plugin: SME
+    Plugin: MongoosePlugin,
+    QuerySearchBuilder: QuerySearchBuilder
   };
 })();

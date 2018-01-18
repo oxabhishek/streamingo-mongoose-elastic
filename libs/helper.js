@@ -94,11 +94,13 @@
    * @param schema - schema provided by mongoose on registering schema as a mongoose plugin
    * @return {object}
    */
-  Helper.getSchemaMappings = function (schema) {
+  Helper.getSchemaMappings = function (schema, parentName) {
     var mappings = {}, // needed if there exists at least one such sme_indexed field in schema
       allMappings = {}, // needed if sme_indexed is not specified for any field in schema
       paths = schema.paths,
       path;
+
+    parentName = parentName || "";
 
     for (path in paths) {
       if (!paths.hasOwnProperty(path)) {
@@ -125,8 +127,27 @@
         allMappings[path].null_value = paths[path].options.sme_null_value;
       }
 
+      if (paths[path].options.sme_copy_to && paths[path].options.sme_copy_to.field) {
+        allMappings[path].copy_to = paths[path].options.sme_copy_to.field;
+        if (paths[path].options.sme_copy_to.copy_separate) {
+          allMappings[path].copy_to += "_" + (parentName ? parentName + "_" : "") + path;
+        }
+        if (!parentName) {
+          allMappings[allMappings[path].copy_to] = {
+            type: paths[path].options.sme_copy_to.type || "text"
+          };
+        } else {
+          allMappings.copy_to_parent = {};
+          allMappings.copy_to_parent[allMappings[path].copy_to] = {
+            type: paths[path].options.sme_copy_to.type || "text"
+          };
+        }
+      }
+
       if (allMappings[path].type === "nested") {
-        allMappings[path]["properties"] = Helper.getSchemaMappings(paths[path].schema);
+        allMappings[path]["properties"] = Helper.getSchemaMappings(paths[path].schema, path);
+        Object.assign(allMappings, allMappings[path]["properties"].copy_to_parent);
+        delete allMappings[path]["properties"].copy_to_parent;
       }
 
       // if however sme_indexed is provided, set mappings object
@@ -144,9 +165,28 @@
           mappings[path].null_value = paths[path].options.sme_null_value;
         }
 
+        if (paths[path].options.sme_copy_to && paths[path].options.sme_copy_to.field) {
+          mappings[path].copy_to = paths[path].options.sme_copy_to.field;
+          if (paths[path].options.sme_copy_to.copy_separate) {
+            mappings[path].copy_to += "_" + (parentName ? parentName + "_" : "") + path;
+          }
+          if (!parentName) {
+            mappings[mappings[path].copy_to] = {
+              type: paths[path].options.sme_copy_to.type || "text"
+            };
+          } else {
+            mappings.copy_to_parent = {};
+            mappings.copy_to_parent[mappings[path].copy_to] = {
+              type: paths[path].options.sme_copy_to.type || "text"
+            };
+          }
+        }
+
         // if mappings is nested, recurse on the nested schema
         if (mappings[path].type === "nested") {
-          mappings[path]["properties"] = Helper.getSchemaMappings(paths[path].schema);
+          mappings[path]["properties"] = Helper.getSchemaMappings(paths[path].schema, path);
+          Object.assign(mappings, mappings[path]["properties"].copy_to_parent);
+          delete mappings[path]["properties"].copy_to_parent;
         }
       }
     }
