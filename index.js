@@ -54,7 +54,7 @@
     /**
      * @description on invoking this function, syncs mongo data with ES defined by query param
      * @param query - defines what data to be picked up from db to index
-     * @param options
+     * @param opts
      * @param callback
      */
     schema.statics.synchronizeData = function (query, opts, callback) {
@@ -85,7 +85,7 @@
         for (i = 0; i < iterations; i++) {
           asyncTasks.push(function (callback) {
             that
-              .find()
+              .find(query)
               .select(esIndexedFields.join(" "))
               .limit(BATCH_SIZE)
               .skip(BATCH_SIZE * j++)
@@ -393,7 +393,7 @@
      */
     publicMethods._getESClient = function () {
       return client;
-    }
+    };
 
     return publicMethods;
   };
